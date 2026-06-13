@@ -31,8 +31,8 @@ from shutil import copyfile
 
 #Python modules
 import numpy as np
-from configParser import SafeConfigParser
-config = SafeConfigParser()
+from configparser import ConfigParser
+config = ConfigParser()
 
 #External modules from pytopkapi
 from pytopkapi import arcfltgrid

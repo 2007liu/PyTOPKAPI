@@ -37,7 +37,8 @@ def _create_dataset(h5file, grp_name, dset_name, shape, units):
     """
     if '{}/{}'.format(grp_name, dset_name) not in h5file:
         dset = h5file.create_dataset('{}/{}'.format(grp_name, dset_name),
-                               shape, maxshape=(None, None), compression='gzip')
+                               shape, maxshape=(None, None), compression='gzip',
+                               dtype='f4')
 
         dset.attrs['units'] = units
 

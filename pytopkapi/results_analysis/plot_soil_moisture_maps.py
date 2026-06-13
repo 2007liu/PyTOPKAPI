@@ -10,8 +10,8 @@ import numpy.ma as M
 import pytopkapi.pretreatment as pm
 import pytopkapi.utils as ut
 
-from configparser import SafeConfigParser
-config = SafeConfigParser()
+from configparser import ConfigParser
+config = ConfigParser()
 
 
 def run(ini_file='plot_soil_moisture_maps.ini'):

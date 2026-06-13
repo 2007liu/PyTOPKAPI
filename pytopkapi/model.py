@@ -9,7 +9,7 @@ simulation based on the parameters specified in an INI file.
 import os.path
 import functools
 import multiprocessing as mp
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 from concurrent.futures import ProcessPoolExecutor, wait
 
 import h5py
@@ -29,7 +29,7 @@ no_data = np.nan
 
 def run(ini_file='TOPKAPI.ini',
         verbose=False, quiet=False,
-        parallel_exec=True, nworkers=int(mp.cpu_count()-1)):
+        parallel_exec=True, nworkers=min(int(mp.cpu_count()-1), 61)):
     """Run the model.
 
     Parameters
@@ -55,7 +55,7 @@ def run(ini_file='TOPKAPI.ini',
     ##================================##
     ##  Read the input file (*.ini)   ##
     ##================================##
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(ini_file)
 
     ##~~~~~~ Numerical_options ~~~~~~##

@@ -1,6 +1,6 @@
 import os
 
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 
 import h5py
 import numpy as np
@@ -130,7 +130,7 @@ def continuity_error(ini_fname, delta_t, cell_id, X, channel_indices):
     pytopkapi.run(ini_fname)
 
     # parse the config file
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(ini_fname)
 
     precip_fname = config.get('input_files', 'file_rain')

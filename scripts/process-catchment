@@ -18,7 +18,7 @@ should not be required.
 """
 import os
 import sys
-from ConfigParser import SafeConfigParser
+from configparser import ConfigParser
 
 import numpy as np
 import grass.script as grass
@@ -27,7 +27,7 @@ os.environ['GRASS_OVERWRITE'] = '1'
 
 # Read configuration file
 ini_file = sys.argv[1]
-config = SafeConfigParser()
+config = ConfigParser()
 config.read(ini_file)
 
 catch_id = config.get('parameters', 'catchment_id')

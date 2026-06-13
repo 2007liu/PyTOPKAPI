@@ -4,6 +4,7 @@ Functions required to compute the intrinsic TOPKAPI parameters from the
 physical parameters
 
 """
+import copy
 import warnings
 
 import numpy as np
@@ -191,14 +192,14 @@ def sort_cell(ar_cell_label, ar_cell_down):
     """
     network_dag = _generate_network_dag(ar_cell_label, ar_cell_down)
 
-    ar_label_sort = np.array(nx.topological_sort(network_dag))
+    ar_label_sort = np.array(list(nx.topological_sort(network_dag)))
 
     return ar_label_sort
 
 def compute_node_hierarchy(nodes, downstream_nodes):
     network_dag = _generate_network_dag(nodes, downstream_nodes)
 
-    dag_copy = nx.copy.deepcopy(network_dag)
+    dag_copy = copy.deepcopy(network_dag)
 
     level = 0
     node_hierarchy = {}
@@ -414,12 +415,9 @@ def compute_cell_param(X, ar_Xc, Dt, alpha_s, alpha_o,
     ar_W = W_max + ((W_max-W_min)/(A_total**0.5-A_thres**0.5)) \
            * (ar_A_drained**0.5-A_total**0.5)
 
-    with warnings.catch_warnings():
-        # Cells without channel stores cause harmless zero-division errors
-        warnings.filterwarnings('ignore',
-                                r'divide by zero encountered in true_divide')
-
-        ar_Cc=(1/ar_n_c)*(ar_tan_beta_channel)**0.5
+    # Cells without channel stores cause harmless zero-division errors
+    ar_n_c_safe = np.maximum(ar_n_c, 1e-10)
+    ar_Cc = (1 / ar_n_c_safe) * (np.maximum(ar_tan_beta_channel, 1e-10)) ** 0.5
 
     ar_b_c=ar_Cc*ar_W/((ar_Xc*ar_W)**(alpha_c))
     ar_W[ar_lambda==0]=-99.9

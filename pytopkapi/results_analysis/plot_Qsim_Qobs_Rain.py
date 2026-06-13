@@ -1,5 +1,5 @@
 import datetime as dt
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 
 import h5py
 import numpy as np
@@ -9,7 +9,7 @@ from matplotlib.dates import date2num
 import pytopkapi.utils as ut
 
 def run(ini_file='plot_Qsim_Qobs_Rain.ini'):
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(ini_file)
     print('Read the file ',ini_file)
 
@@ -121,7 +121,7 @@ def read_observed_flow(file_name):
     """Read the observed flow from a data file.
 
     """
-    date = np.loadtxt(file_name, dtype=np.int, usecols=(0, 1, 2, 3, 4))
+    date = np.loadtxt(file_name, dtype=int, usecols=(0, 1, 2, 3, 4))
     dates = [dt.datetime(yr, mon, dy, hr, mn) for yr, mon, dy, hr, mn in date]
 
     Q = np.loadtxt(file_name, usecols=(5,))

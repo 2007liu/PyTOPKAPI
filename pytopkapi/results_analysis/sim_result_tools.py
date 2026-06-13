@@ -4,7 +4,7 @@ __all__ = ['extract_ssi', 'extract_ssi_to_file',
            'extract_overland_volume', 'extract_overland_volume_to_file']
 
 from datetime import timedelta
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 
 import h5py
 import numpy as np
@@ -33,7 +33,7 @@ def extract_Q_down(control_fname):
         the overland and soil store of each cell.
 
     """
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(control_fname)
 
     sim_fname = config.get('output_files', 'file_out')
@@ -64,7 +64,7 @@ def extract_Q_channel(control_fname):
         channel cells.
 
     """
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(control_fname)
 
     param_fname = config.get('input_files', 'file_cell_param')
@@ -103,7 +103,7 @@ def extract_overland_volume(control_fname):
         overland store of each cell.
 
     """
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(control_fname)
 
     sim_fname = config.get('output_files', 'file_out')
@@ -216,7 +216,7 @@ def extract_ssi(control_fname):
         A Numpy array containing the calculated SSI values.
 
     """
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(control_fname)
 
     global_param_fname = config.get('input_files', 'file_global_param')
@@ -359,7 +359,7 @@ def extract_eta(control_fname):
         A Numpy array containing the calculated ETa values.
 
     """
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(control_fname)
 
     param_fname = config.get('input_files', 'file_cell_param')

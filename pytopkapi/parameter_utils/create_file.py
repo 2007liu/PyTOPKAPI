@@ -29,7 +29,7 @@ to South is: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
 """
 import sys
 from warnings import warn
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 
 import numpy as np
 from numpy import ma
@@ -145,7 +145,7 @@ def generate_param_file(ini_fname, isolated_cells=False):
     `pytopkapi.parameter_utils.modify_file`.
 
     """
-    config = SafeConfigParser()
+    config = ConfigParser()
     config.read(ini_fname)
 
     dem_fname = config.get('raster_files', 'dem_fname')
