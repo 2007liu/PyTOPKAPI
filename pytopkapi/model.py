@@ -613,7 +613,7 @@ def _parallel_execute(model_params):
               ascii=True, desc=progress_desc, unit=' cell') as pbar:
         ## Loop on cell hierarchy
         for lvl in range(len(node_hierarchy.keys())):
-            futures = []
+            cell_futures = []
             for cell in node_hierarchy[lvl]:
 
                 if cell == model_params['cell_external_flow']:
@@ -668,36 +668,39 @@ def _parallel_execute(model_params):
                     }
 
                 f = pool.submit(_solve_cell_timeseries, ts_params)
-                f.add_done_callback(functools.partial(_cell_clean_up,
-                                                      cell, pbar, model_params))
+                f.add_done_callback(
+                    functools.partial(_cell_progress, pbar))
+                cell_futures.append((cell, f))
 
-                futures.append(f)
+            wait([f for _, f in cell_futures])
 
-            wait(futures)
+            # Write results synchronously after all cells in this level
+            for cell, f in cell_futures:
+                ts_result = f.result()
+
+                model_params['dset_Vs'][1:, cell] = ts_result['Vs1']
+                model_params['dset_Vo'][1:, cell] = ts_result['Vo1']
+                model_params['dset_Vc'][1:, cell] = ts_result['Vc1']
+
+                model_params['dset_Qs_out'][1:, cell] = ts_result['Qs_out']
+                model_params['dset_Qo_out'][1:, cell] = ts_result['Qo_out']
+                model_params['dset_Qc_out'][1:, cell] = ts_result['Qc_out']
+
+                model_params['dset_Q_down'][1:, cell] = ts_result['Q_down']
+
+                model_params['dset_ET_out'][1:, cell] = ts_result['ETa']
+                Ec = ts_result['ET_channel'] * 1e-3
+                Ec = Ec * model_params['W'][cell]
+                Ec = Ec * model_params['Xc'][cell]
+                model_params['dset_Ec_out'][1:, cell] = Ec
+
+            # Flush HDF5 to ensure data is visible to next level
+            model_params['dset_Vs'].file.flush()
 
     pool.shutdown()
 
-def _cell_clean_up(cell, pbar, model_params, future):
-    ts_result = future.result()
 
-    # Write results to disk
-    model_params['dset_Vs'][1:, cell] = ts_result['Vs1']
-    model_params['dset_Vo'][1:, cell] = ts_result['Vo1']
-    model_params['dset_Vc'][1:, cell] = ts_result['Vc1']
-
-    model_params['dset_Qs_out'][1:, cell] = ts_result['Qs_out']
-    model_params['dset_Qo_out'][1:, cell] = ts_result['Qo_out']
-    model_params['dset_Qc_out'][1:, cell] = ts_result['Qc_out']
-
-    model_params['dset_Q_down'][1:, cell] = ts_result['Q_down']
-
-    model_params['dset_ET_out'][1:, cell] = ts_result['ETa']
-    Ec = ts_result['ET_channel']*1e-3
-    Ec = Ec * model_params['W'][cell]
-    Ec = Ec * model_params['Xc'][cell]
-    model_params['dset_Ec_out'][1:, cell] = Ec
-
-    # Update progress meter as cell calcs are completed
+def _cell_progress(pbar, future):
     pbar.update()
 
 def _solve_cell_timeseries(tseries_params):
